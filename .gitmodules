@@ -7,12 +7,14 @@
 [submodule "aw-server"]
 	path = aw-server
 	url = https://github.com/CyberCraftInc/aw-server.git
+	branch = master
 [submodule "aw-watcher-afk"]
 	path = aw-watcher-afk
 	url = https://github.com/ActivityWatch/aw-watcher-afk.git
 [submodule "aw-qt"]
 	path = aw-qt
 	url = https://github.com/CyberCraftInc/aw-qt.git
+	branch = master
 [submodule "aw-watcher-window"]
 	path = aw-watcher-window
 	url = https://github.com/ActivityWatch/aw-watcher-window.git
@@ -22,6 +24,7 @@
 [submodule "aw-notify"]
 	path = aw-notify
 	url = https://github.com/CyberCraftInc/aw-notify.git
+	branch = master
 [submodule "aw-watcher-input"]
 	path = aw-watcher-input
 	url = https://github.com/ActivityWatch/aw-watcher-input.git
