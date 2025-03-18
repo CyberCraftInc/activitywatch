@@ -408,6 +408,74 @@ jobs:
         
         poetry install
 
+    - name: Linux/macOS-specific build for aw-server
+      if: runner.os != 'Windows'
+      run: |
+        cd aw-server/aw-webui
+        
+        echo "Current Makefile content:"
+        cat Makefile
+        
+        cat > Makefile << 'EOF'
+        prebuild: node_modules/
+        	@echo "Skipping logo files check"
+        
+        node_modules/: package.json
+        	npm ci
+        
+        build: prebuild
+        	npm run build
+        
+        clean:
+        	rm -rf dist
+        	rm -rf node_modules
+        
+        .PHONY: build prebuild clean
+        EOF
+        
+        echo "New Makefile content:"
+        cat Makefile
+        
+        npm ci
+        npm run build
+        
+        cd ..
+        mkdir -p aw_server/static/
+        cp -r aw-webui/dist/* aw_server/static/
+        
+        poetry install
+
+    - name: Build with custom approach for aw-server
+      run: |
+        cd aw-server
+        
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          powershell -Command "(Get-Content Makefile) | ForEach-Object { if(\$_ -match '^aw-webui:') {\$_ -replace '^aw-webui:.*', 'aw-webui:\\n\\techo \"Skipping aw-webui build as it was built separately\"'} else {\$_} } | Set-Content Makefile.new"
+          move Makefile.new Makefile
+        else
+          sed '/^aw-webui:/,/^[a-zA-Z]/ s/^	make.*$/	echo "Skipping aw-webui build as it was built separately"/' Makefile > Makefile.new
+          mv Makefile.new Makefile
+        fi
+        
+        cd ..
+        
+        python3 -m venv venv
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          source venv/Scripts/activate
+        else
+          source venv/bin/activate
+        fi
+        
+        poetry install
+        
+        for module in aw-core aw-client aw-qt aw-watcher-afk aw-watcher-window aw-server-rust aw-notify aw-watcher-input; do
+          echo "Building $module"
+          make --directory=$module build || { echo "Error in $module build"; exit 2; }
+        done
+        
+        echo "All modules built successfully!"
+        pip freeze  # output Python packages, useful for debugging dependency versions
+
   release-notes:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')  # only on runs triggered from tag
