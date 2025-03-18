@@ -330,6 +330,83 @@ jobs:
           echo "ERROR: aw-webui Makefile not found!"
         fi
 
+    - name: Create placeholder logo files if needed
+      run: |
+        echo "Creating placeholder logo files in all required locations"
+        
+        mkdir -p aw-server/aw-webui/static
+        mkdir -p aw-server/aw-webui/media/logo
+        
+        if [ ! -f "aw-server/aw-webui/static/logo.png" ]; then
+          touch aw-server/aw-webui/static/logo.png
+          echo "Created placeholder static/logo.png"
+        fi
+        
+        if [ ! -f "aw-server/aw-webui/static/logo.svg" ]; then
+          touch aw-server/aw-webui/static/logo.svg
+          echo "Created placeholder static/logo.svg"
+        fi
+        
+        if [ ! -f "aw-server/aw-webui/media/logo/logo.png" ]; then
+          mkdir -p aw-server/aw-webui/media/logo
+          touch aw-server/aw-webui/media/logo/logo.png
+          echo "Created placeholder media/logo/logo.png"
+        fi
+        
+        if [ ! -f "aw-server/aw-webui/media/logo/logo.svg" ]; then
+          mkdir -p aw-server/aw-webui/media/logo
+          touch aw-server/aw-webui/media/logo/logo.svg
+          echo "Created placeholder media/logo/logo.svg"
+        fi
+        
+        echo "Files in aw-server/aw-webui/static:"
+        ls -la aw-server/aw-webui/static
+        
+        echo "Files in aw-server/aw-webui/media/logo (if exists):"
+        if [ -d "aw-server/aw-webui/media/logo" ]; then
+          ls -la aw-server/aw-webui/media/logo
+        else
+          echo "Directory not found"
+        fi
+
+    - name: Modify build steps for aw-server (all OS)
+      run: |
+        echo "Creating custom build script for aw-server"
+        
+        cat > build-aw-server.sh << 'EOF'
+        #!/bin/bash
+        set -e
+        
+        cd aw-server
+        
+        mkdir -p aw_server/static/
+        
+        cd aw-webui
+        npm ci
+        npm run build
+        cd ..
+        
+        cp -r aw-webui/dist/* aw_server/static/
+        
+        poetry install
+        
+        cd ..
+        EOF
+        
+        chmod +x build-aw-server.sh
+        
+        echo "Contents of build-aw-server.sh:"
+        cat build-aw-server.sh
+
+    - name: Custom build for aw-server
+      run: |
+        if [ -f "build-aw-server.sh" ]; then
+          echo "Running custom build for aw-server"
+          ./build-aw-server.sh
+        else
+          echo "ERROR: Custom build script not found!"
+        fi
+
   release-notes:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')  # only on runs triggered from tag
