@@ -309,6 +309,27 @@ jobs:
         name: builds-${{ runner.os }}-py${{ matrix.python_version }}
         path: dist/activitywatch-*.*
 
+    - name: Fix aw-webui Makefile for build
+      run: |
+        echo "Modifying aw-webui Makefile to skip logo requirements"
+        
+        if [ -f "aw-server/aw-webui/Makefile" ]; then
+          cp aw-server/aw-webui/Makefile aw-server/aw-webui/Makefile.bak
+          
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            powershell -Command "(Get-Content aw-server/aw-webui/Makefile) -replace 'prebuild: node_modules/ static/logo.png static/logo.svg', 'prebuild: node_modules/' | Set-Content aw-server/aw-webui/Makefile"
+          else
+            sed -i 's/prebuild: node_modules\/ static\/logo.png static\/logo.svg/prebuild: node_modules\//g' aw-server/aw-webui/Makefile
+          fi
+          
+          echo "Modified Makefile:"
+          cat aw-server/aw-webui/Makefile
+          
+          mkdir -p aw-server/aw-webui/static
+        else
+          echo "ERROR: aw-webui Makefile not found!"
+        fi
+
   release-notes:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')  # only on runs triggered from tag
