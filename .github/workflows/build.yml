@@ -115,6 +115,13 @@ jobs:
         ref: development
         path: media
 
+    - name: Checkout aw-webui in aw-server
+      uses: actions/checkout@v4
+      with:
+        repository: CyberCraftInc/aw-webui
+        ref: development
+        path: aw-server/aw-webui
+
     # Build in release mode if: (longer build times)
     #  - on a tag (release)
     #  - on the master branch (nightly)
