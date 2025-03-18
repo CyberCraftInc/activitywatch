@@ -42,21 +42,78 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
+        submodules: false
+        fetch-depth: 0
+    
+    - name: Checkout aw-core
+      uses: actions/checkout@v4
+      with:
         repository: ActivityWatch/aw-core
         ref: master
         path: aw-core
-        
-    - uses: actions/checkout@v4
+    
+    - name: Checkout aw-client
+      uses: actions/checkout@v4
       with:
-        repository: ActivityWatch/aw-server
+        repository: ActivityWatch/aw-client
+        ref: master
+        path: aw-client
+    
+    - name: Checkout aw-server
+      uses: actions/checkout@v4
+      with:
+        repository: CyberCraftInc/aw-server
         ref: development
         path: aw-server
-        
-    - uses: actions/checkout@v4
+    
+    - name: Checkout aw-watcher-afk
+      uses: actions/checkout@v4
       with:
-        repository: ActivityWatch/aw-webui
+        repository: ActivityWatch/aw-watcher-afk
+        ref: master
+        path: aw-watcher-afk
+        
+    - name: Checkout aw-qt
+      uses: actions/checkout@v4
+      with:
+        repository: CyberCraftInc/aw-qt
         ref: development
-        path: aw-webui
+        path: aw-qt
+    
+    - name: Checkout aw-watcher-window
+      uses: actions/checkout@v4
+      with:
+        repository: ActivityWatch/aw-watcher-window
+        ref: master
+        path: aw-watcher-window
+        
+    - name: Checkout aw-server-rust
+      uses: actions/checkout@v4
+      with:
+        repository: ActivityWatch/aw-server-rust
+        ref: master
+        path: aw-server-rust
+        
+    - name: Checkout aw-notify
+      uses: actions/checkout@v4
+      with:
+        repository: CyberCraftInc/aw-notify
+        ref: development
+        path: aw-notify
+        
+    - name: Checkout aw-watcher-input
+      uses: actions/checkout@v4
+      with:
+        repository: ActivityWatch/aw-watcher-input
+        ref: master
+        path: aw-watcher-input
+        
+    - name: Checkout media
+      uses: actions/checkout@v4
+      with:
+        repository: CyberCraftInc/media
+        ref: development
+        path: media
 
     # Build in release mode if: (longer build times)
     #  - on a tag (release)
